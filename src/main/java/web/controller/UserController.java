@@ -5,18 +5,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import web.dao.UserDao;
+import web.service.UserService;
 import web.model.User;
 
 import javax.validation.Valid;
 
 @Controller
 public class UserController {
-    private final UserDao userDao;
+    private final UserService userService;
 
     @Autowired
-    public UserController(UserDao userDao) {
-        this.userDao = userDao;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @ModelAttribute("newUser")
@@ -26,29 +26,29 @@ public class UserController {
 
     @GetMapping("/people")
     public String index(Model model) {
-        model.addAttribute("people", userDao.getAllUsers());
+        model.addAttribute("people", userService.getAllUsers());
         return "user";
     }
 
     @PostMapping("/people")
     public String creat(@ModelAttribute("newUser") @Valid User user, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("people", userDao.getAllUsers());
+            model.addAttribute("people", userService.getAllUsers());
             return "user";
         }
-        userDao.saveUser(user);
+        userService.saveUser(user);
         return "redirect:/people";
     }
 
     @DeleteMapping("/people/{id}")
     public String deletePerson(@PathVariable("id") int id) {
-        userDao.removeUserById(id);
+        userService.removeUserById(id);
         return "redirect:/people";
     }
 
     @GetMapping("/people/{id}/edit")
     public String edit(@ModelAttribute("id") int id, Model model) {
-        model.addAttribute("user", userDao.getUserById(id));
+        model.addAttribute("user", userService.getUserById(id));
         return "edit";
     }
 
@@ -57,7 +57,7 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "edit";
         }
-        userDao.updateUser(user);
+        userService.updateUser(user);
         return "redirect:/people";
     }
 }
